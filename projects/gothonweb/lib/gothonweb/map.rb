@@ -21,41 +21,69 @@ class Room
 
 end
 
-class Death
-      @@quips = [
-      "You died. You kinda suck at this.",
-      "Your mom would be proud...if she were smarter.",
-      "Such a luser.",
-      "I have a small puppy that's better at this than you."
-    ]
-    @@room_deaths = {
-      'the_bridge' =>
-      """
-      In a panic you throw the bomb at the group of Gothons
-      and make a leap for the door.  Right as you drop it a
-      Gothon shoots you right in the back killing you.
-      As you die you see another Gothon frantically try to disarm
-      the bomb. You die knowing they will probably blow up when
-      it goes off.\n
-      """,
-      'central_corridor_shoot' =>
-      """
-      test.\n
-      """
-    }
-      def enter(prev_room)
-        @words = []
-        @prev_room = prev_room
-        @words.push(@@room_deaths[@prev_room]) # pulls the death scene from the hash
-        # Note that rand will pull an integer and there is a -1 as the quips array starts at 0
-        @words.push(@@quips[rand(0..(@@quips.length - 1))])
-        return @words.join('')
-        #exit(1)
-      end
-end
+# class Death
+#
+#       def enter(prev_room)
+#         @words = []
+#         @prev_room = prev_room
+#         @words.push(Map::@room_deaths[@prev_room]) # pulls the death scene from the hash
+#         # Note that rand will pull an integer and there is a -1 as the quips array starts at 0
+#         @words.push(Map::@quips[rand(0..(@quips.length - 1))])
+#         return @words.join('')
+#         #exit(1)
+#       end
+# end
 
 
 module Map
+
+@@code = "#{rand(1..9)}#{rand(1..9)}#{rand(1..9)}"
+@@guesses = 1
+
+@@quips = [
+"You died. You kinda suck at this.",
+"Your mom would be proud...if she were smarter.",
+"Such a luser.",
+"I have a small puppy that's better at this than you."
+]
+
+@@room_deaths = {
+'the_bridge' =>
+"""
+In a panic you throw the bomb at the group of Gothons
+and make a leap for the door.  Right as you drop it a
+Gothon shoots you right in the back killing you.
+As you die you see another Gothon frantically try to disarm
+the bomb. You die knowing they will probably blow up when
+it goes off.\n
+""",
+'central_corridor_shoot' =>
+"""
+Quick on the draw you yank out your blaster and fire it at the Gothon.
+His clown costume is flowing and moving around his body, which throws
+off your aim.  Your laser hits his costume but misses him entirely.  This
+completely ruins his brand new costume his mother bought him, which
+makes him fly into an insane rage and blast you repeatedly in the face until
+you are dead.  Then he eats you.\n
+""",
+'central_corridor_dodge' =>
+"""
+Like a world class boxer you dodge, weave, slip and slide right
+as the Gothon's blaster cranks a laser past your head.
+In the middle of your artful dodge your foot slips and you
+bang your head on the metal wall and pass out.
+You wake up shortly after only to die as the Gothon stomps on
+your head and eats you.\n
+""",
+'laser_weapon_armory' =>
+"""
+The lock buzzes one last time and then you hear a sickening
+melting sound as the mechanism is fused together.
+You decide to sit there, and finally the Gothons blow up the
+ship from their ship and you die.\n
+""",
+}
+
   CENTRAL_CORRIDOR = Room.new("Central Corridor",
     """
     The Gothons of Planet Percal #25 have invaded your ship and destroyed
@@ -147,23 +175,27 @@ ESCAPE_POD.add_paths({
   '*' => THE_END_LOSER
   })
 
-GENERIC_DEATH = Room.new("death", "You died.")
+# Must be a way to implement a single room which pulls the description from the name of the previous room
+CC_SHOOT_DEATH = Room.new("death", @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))])
+CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'] + @@quips[rand(0..(@@quips.length - 1))])
+LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'] + @@quips[rand(0..(@@quips.length - 1))])
+TB_DEATH = Room.new("death", @@room_deaths['the_bridge'] + @@quips[rand(0..(@@quips.length - 1))])
 
-DEATH = Death.new()
+#GENERIC_DEATH = Room.new('death',"you died")
 
 THE_BRIDGE.add_paths({
-  'throw the bomb' => DEATH.enter('the_bridge'), #Death.enter(result.class.name),
+  'throw the bomb' => TB_DEATH, # .enter('the_bridge'), #Death.enter(result.class.name),
   'slowly place the bomb' => ESCAPE_POD
   })
 
 LASER_WEAPON_ARMORY.add_paths({
   '0132' => THE_BRIDGE,
-  '*' => GENERIC_DEATH
+  '*' => LWA_DEATH # DEATH.enter('laser_weapon_armory'),
   })
 
 CENTRAL_CORRIDOR.add_paths({
-  'shoot!' => DEATH.enter('central_corridor_shoot'),
-  'dodge!' => GENERIC_DEATH,
+  'shoot!' => CC_SHOOT_DEATH, # .enter('central_corridor_shoot'),
+  'dodge!' => CC_DODGE_DEATH, # DEATH.enter('central_corridor_dodge'),
   'tell a joke' => LASER_WEAPON_ARMORY
   })
 

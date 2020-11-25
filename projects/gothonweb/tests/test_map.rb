@@ -42,18 +42,19 @@ class TestGame < Test::Unit::TestCase
 
 
   def test_gothon_game_map()
-        #assert_equal(Map::DEATH, Map::START.go('shoot!'))
-        assert_equal(Map::GENERIC_DEATH, Map::START.go('dodge!'))
+        assert_equal(Map::CC_SHOOT_DEATH, Map::START.go('shoot!'))
+        assert_includes(Map::START.go('shoot!').description, "Quick on the")
+        assert_includes(Map::START.go('dodge!').description, "Like a world")
 
         room = Map::START.go('tell a joke')
         assert_equal(Map::LASER_WEAPON_ARMORY, room)
-        assert_equal(Map::GENERIC_DEATH, room.go('*'))
+        assert_includes(room.go('*').description, "The lock buzzes")
         #assert_equal(Map::GENERIC_DEATH, room.go('test'))
 
         room = room.go('0132')
         assert_equal(Map::THE_BRIDGE, room)
         #assert_equal(Map::DEATH, room.go('throw the bomb'))
-        assert_includes(room.go('throw the bomb'), "In a panic")
+        assert_includes(room.go('throw the bomb').description, "In a panic")
 
         room = room.go('slowly place the bomb')
         assert_equal(Map::ESCAPE_POD, room)
