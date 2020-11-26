@@ -12,6 +12,7 @@ class Room
   attr_reader :description
 
   def go(direction)
+    #@@direction = direction
     return @paths[direction]
   end
 
@@ -36,53 +37,55 @@ end
 
 
 module Map
+  # @@session = []
+  # @@direction = []
 
-@@code = "#{rand(1..9)}#{rand(1..9)}#{rand(1..9)}"
-@@guesses = 1
+  @@code = "#{rand(1..9)}#{rand(1..9)}#{rand(1..9)}"
+  @@guesses = 1
 
-@@quips = [
-"You died. You kinda suck at this.",
-"Your mom would be proud...if she were smarter.",
-"Such a luser.",
-"I have a small puppy that's better at this than you."
-]
+  @@quips = [
+    "You died. You kinda suck at this.",
+    "Your mom would be proud...if she were smarter.",
+    "Such a luser.",
+    "I have a small puppy that's better at this than you."
+    ]
 
-@@room_deaths = {
-'the_bridge' =>
-"""
-In a panic you throw the bomb at the group of Gothons
-and make a leap for the door.  Right as you drop it a
-Gothon shoots you right in the back killing you.
-As you die you see another Gothon frantically try to disarm
-the bomb. You die knowing they will probably blow up when
-it goes off.\n
-""",
-'central_corridor_shoot' =>
-"""
-Quick on the draw you yank out your blaster and fire it at the Gothon.
-His clown costume is flowing and moving around his body, which throws
-off your aim.  Your laser hits his costume but misses him entirely.  This
-completely ruins his brand new costume his mother bought him, which
-makes him fly into an insane rage and blast you repeatedly in the face until
-you are dead.  Then he eats you.\n
-""",
-'central_corridor_dodge' =>
-"""
-Like a world class boxer you dodge, weave, slip and slide right
-as the Gothon's blaster cranks a laser past your head.
-In the middle of your artful dodge your foot slips and you
-bang your head on the metal wall and pass out.
-You wake up shortly after only to die as the Gothon stomps on
-your head and eats you.\n
-""",
-'laser_weapon_armory' =>
-"""
-The lock buzzes one last time and then you hear a sickening
-melting sound as the mechanism is fused together.
-You decide to sit there, and finally the Gothons blow up the
-ship from their ship and you die.\n
-""",
-}
+  @@room_deaths = {
+  'the_bridge' =>
+    """
+    In a panic you throw the bomb at the group of Gothons
+    and make a leap for the door.  Right as you drop it a
+    Gothon shoots you right in the back killing you.
+    As you die you see another Gothon frantically try to disarm
+    the bomb. You die knowing they will probably blow up when
+    it goes off.\n
+    """,
+  'central_corridor_shoot' =>
+    """
+    Quick on the draw you yank out your blaster and fire it at the Gothon.
+    His clown costume is flowing and moving around his body, which throws
+    off your aim.  Your laser hits his costume but misses him entirely.  This
+    completely ruins his brand new costume his mother bought him, which
+    makes him fly into an insane rage and blast you repeatedly in the face until
+    you are dead.  Then he eats you.\n
+    """,
+  'central_corridor_dodge' =>
+    """
+    Like a world class boxer you dodge, weave, slip and slide right
+    as the Gothon's blaster cranks a laser past your head.
+    In the middle of your artful dodge your foot slips and you
+    bang your head on the metal wall and pass out.
+    You wake up shortly after only to die as the Gothon stomps on
+    your head and eats you.\n
+    """,
+  'laser_weapon_armory' =>
+    """
+    The lock buzzes one last time and then you hear a sickening
+    melting sound as the mechanism is fused together.
+    You decide to sit there, and finally the Gothons blow up the
+    ship from their ship and you die.\n
+    """,
+  }
 
   CENTRAL_CORRIDOR = Room.new("Central Corridor",
     """
@@ -130,24 +133,24 @@ ship from their ship and you die.\n
     """)
 
 
-    ESCAPE_POD = Room.new("Escape Pod",
-      """
-      You point your blaster at the bomb under your arm
-      and the Gothons put their hands up and start to sweat.
-      You inch backward to the door, open it, and then carefully
-      place the bomb on the floor, pointing your blaster at it.
-      You then jump back through the door, punch the close button
-      and blast the lock so the Gothons can't get out.
-      Now that the bomb is placed you run to the escape pod to
-      get off this tin can.
-      You rush through the ship desperately trying to make it to
-      the escape pod before the whole ship explodes.  It seems like
-      hardly any Gothons are on the ship, so your run is clear of
-      interference.  You get to the chamber with the escape pods, and
-      now need to pick one to take.  Some of them could be damaged
-      but you don't have time to look.  There's 5 pods, which one
-      do you take?
-      """)
+  ESCAPE_POD = Room.new("Escape Pod",
+    """
+    You point your blaster at the bomb under your arm
+    and the Gothons put their hands up and start to sweat.
+    You inch backward to the door, open it, and then carefully
+    place the bomb on the floor, pointing your blaster at it.
+    You then jump back through the door, punch the close button
+    and blast the lock so the Gothons can't get out.
+    Now that the bomb is placed you run to the escape pod to
+    get off this tin can.
+    You rush through the ship desperately trying to make it to
+    the escape pod before the whole ship explodes.  It seems like
+    hardly any Gothons are on the ship, so your run is clear of
+    interference.  You get to the chamber with the escape pods, and
+    now need to pick one to take.  Some of them could be damaged
+    but you don't have time to look.  There's 5 pods, which one
+    do you take?
+    """)
 
 
   THE_END_WINNER = Room.new("The End",
@@ -170,50 +173,59 @@ ship from their ship and you die.\n
     """
     )
 
-ESCAPE_POD.add_paths({
-  '2' => THE_END_WINNER,
-  '*' => THE_END_LOSER
-  })
+  ESCAPE_POD.add_paths({
+    '2' => THE_END_WINNER,
+    '*' => THE_END_LOSER
+    })
 
-# Must be a way to implement a single room which pulls the description from the name of the previous room
-CC_SHOOT_DEATH = Room.new("death", @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))])
-CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'] + @@quips[rand(0..(@@quips.length - 1))])
-LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'] + @@quips[rand(0..(@@quips.length - 1))])
-TB_DEATH = Room.new("death", @@room_deaths['the_bridge'] + @@quips[rand(0..(@@quips.length - 1))])
+  # Must be a way to implement a single room which pulls the description from the name of the previous room
+  CC_SHOOT_DEATH = Room.new("death", @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))])
 
-#GENERIC_DEATH = Room.new('death',"you died")
+  CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'] + @@quips[rand(0..(@@quips.length - 1))])
 
-THE_BRIDGE.add_paths({
-  'throw the bomb' => TB_DEATH, # .enter('the_bridge'), #Death.enter(result.class.name),
-  'slowly place the bomb' => ESCAPE_POD
-  })
+  LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'] + @@quips[rand(0..(@@quips.length - 1))])
 
-LASER_WEAPON_ARMORY.add_paths({
-  '0132' => THE_BRIDGE,
-  '*' => LWA_DEATH # DEATH.enter('laser_weapon_armory'),
-  })
+  TB_DEATH = Room.new("death", @@room_deaths['the_bridge'] + @@quips[rand(0..(@@quips.length - 1))])
 
-CENTRAL_CORRIDOR.add_paths({
-  'shoot!' => CC_SHOOT_DEATH, # .enter('central_corridor_shoot'),
-  'dodge!' => CC_DODGE_DEATH, # DEATH.enter('central_corridor_dodge'),
-  'tell a joke' => LASER_WEAPON_ARMORY
-  })
+  #GENERIC_DEATH = Room.new('death',"you died")
+  # DEATH = Room.new("death", @@session.include?('CENTRAL_CORRIDOR') ?
+  #   @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))] : "Test")
 
-START = CENTRAL_CORRIDOR
+  THE_BRIDGE.add_paths({
+    'throw the bomb' => TB_DEATH, # .enter('the_bridge'), #Death.enter(result.class.name),
+    'slowly place the bomb' => ESCAPE_POD
+    })
 
-# A whitelist of allowed room names. We use this so that
-# bad people on the internet can't access random variables
-# with names.  You can use Test::constants and Kernel.const_get
-# too.
-ROOM_NAMES = {
-    'CENTRAL_CORRIDOR' => CENTRAL_CORRIDOR,
-    'LASER_WEAPON_ARMORY' => LASER_WEAPON_ARMORY,
-    'THE_BRIDGE' => THE_BRIDGE,
-    'ESCAPE_POD' => ESCAPE_POD,
-    'THE_END_WINNER' => THE_END_WINNER,
-    'THE_END_LOSER' => THE_END_LOSER,
-    'START' => START,
-  }
+  LASER_WEAPON_ARMORY.add_paths({
+    '0132' => THE_BRIDGE,
+    '*' => LWA_DEATH # DEATH.enter('laser_weapon_armory'),
+    })
+
+  CENTRAL_CORRIDOR.add_paths({
+    'shoot!' => CC_SHOOT_DEATH, # .enter('central_corridor_shoot'),
+    'dodge!' => CC_DODGE_DEATH, # DEATH.enter('central_corridor_dodge'),
+    'tell a joke' => LASER_WEAPON_ARMORY
+    })
+
+  START = CENTRAL_CORRIDOR
+
+  # A whitelist of allowed room names. We use this so that
+  # bad people on the internet can't access random variables
+  # with names.  You can use Test::constants and Kernel.const_get
+  # too.
+  ROOM_NAMES = {
+      'CENTRAL_CORRIDOR' => CENTRAL_CORRIDOR,
+      'LASER_WEAPON_ARMORY' => LASER_WEAPON_ARMORY,
+      'THE_BRIDGE' => THE_BRIDGE,
+      'ESCAPE_POD' => ESCAPE_POD,
+      'THE_END_WINNER' => THE_END_WINNER,
+      'THE_END_LOSER' => THE_END_LOSER,
+      'START' => START,
+      'CC_SHOOT_DEATH' => CC_SHOOT_DEATH,
+      'CC_DODGE_DEATH' => CC_DODGE_DEATH,
+      'LWA_DEATH' => LWA_DEATH,
+      'TB_DEATH' => TB_DEATH
+      }
 
   def scan_code(code,guess)
     # I made this code to make the random number generator puzzle a bit less gruelling
@@ -232,14 +244,25 @@ ROOM_NAMES = {
     # This is then returned to the calling function.
   end
 
-def Map::load_room(session)
-  # Given a session this will return the right room or nil
-  return ROOM_NAMES[session[:room]]
-end
+  def Map::load_room(session)
+    # Given a session this will return the right room or nil
+    #@@session = session
+    return ROOM_NAMES[session[:room]]
+  end
 
-def Map::save_room(session, room)
-  # Store the room in the session for later, using its name
-  session[:room] = ROOM_NAMES.key(room)
-end
+  def Map::save_room(session, room)
+    # Store the room in the session for later, using its name
+    session[:room] = ROOM_NAMES.key(room)
+  end
+  # Try making previous room session to pull for death scenes
 
+  def Map::load_quip
+    quips = [
+      "You died. You kinda suck at this.",
+      "Your mom would be proud...if she were smarter.",
+      "You such a luser.",
+      "I have a small puppy that's better at this than you."
+      ]
+      return quips[rand(0..(quips.length - 1))]
+  end
 end

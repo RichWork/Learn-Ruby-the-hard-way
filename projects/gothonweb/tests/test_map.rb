@@ -42,6 +42,8 @@ class TestGame < Test::Unit::TestCase
 
 
   def test_gothon_game_map()
+      # @@session = Map::current_room('CENTRAL_CORRIDOR')
+      # @@direction = 'shoot!'
         assert_equal(Map::CC_SHOOT_DEATH, Map::START.go('shoot!'))
         assert_includes(Map::START.go('shoot!').description, "Quick on the")
         assert_includes(Map::START.go('dodge!').description, "Like a world")
@@ -78,5 +80,10 @@ class TestGame < Test::Unit::TestCase
 
         Map::save_room(session, room)
         assert_equal(room, Map::LASER_WEAPON_ARMORY)
+  end
+
+  def test_quip()
+    quip = Map::load_quip
+    assert_includes(quip, "you") # may fail due to You/you/your
   end
 end
