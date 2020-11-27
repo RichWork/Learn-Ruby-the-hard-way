@@ -179,13 +179,13 @@ module Map
     })
 
   # Must be a way to implement a single room which pulls the description from the name of the previous room
-  CC_SHOOT_DEATH = Room.new("death", @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))])
+  CC_SHOOT_DEATH = Room.new("death", @@room_deaths['central_corridor_shoot'])
 
-  CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'] + @@quips[rand(0..(@@quips.length - 1))])
+  CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'])
 
-  LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'] + @@quips[rand(0..(@@quips.length - 1))])
+  LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'])
 
-  TB_DEATH = Room.new("death", @@room_deaths['the_bridge'] + @@quips[rand(0..(@@quips.length - 1))])
+  TB_DEATH = Room.new("death", @@room_deaths['the_bridge'])
 
   #GENERIC_DEATH = Room.new('death',"you died")
   # DEATH = Room.new("death", @@session.include?('CENTRAL_CORRIDOR') ?

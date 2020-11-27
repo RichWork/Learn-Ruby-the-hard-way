@@ -9,26 +9,20 @@ enable :sessions
 set :session_secret, 'BADSECRET'
 
 get '/' do
-  redirect to('/session_reset')
-end
-
-get '/session_reset'
-  
-  erb :
-  session.clear
   session[:room] = 'START'
+  redirect to('/game')
+end
 
 get '/game' do
   room = Map::load_room(session)
 
-  if room
-    erb :show_room, :locals => {:room => room}
-    if room.name == 'death'
-      quip = Map::load_quip
-      erb :show_room, :locals => {:quip => quip}
-    end
+  if room && room.name == 'death'
+    quip = Map::load_quip
+    erb :show_room, locals: {room: room, quip: quip}
+  elsif room
+    erb :show_room, locals: {room: room}
   else
-    erb :you_died, :locals => {:room => room}
+    erb :you_died, locals: {room: room}
   end
 end
 
