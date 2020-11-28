@@ -28,6 +28,7 @@ class MyAppTest < Test::Unit::TestCase
     assert last_response.ok? # Not sure what this tests
     assert last_response.body.include?('The Gothons of Planet') # Tests to see if the text 'A Greeting' is there
     assert_equal session[:room], 'START'
+    assert_match /\d/ session[:code]
   end
 
   def test_hello_form_post

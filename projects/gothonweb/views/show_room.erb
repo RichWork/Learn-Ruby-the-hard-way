@@ -4,10 +4,13 @@
 <%= room.description %>
 </pre>
 
-<% if room.name == "death" || room.name == "The End" %>
+<% if room.name == "Death" %>
 <p>
   <%= quip %>
 </p>
+<% end %>
+
+<% if room.name == "Death" || room.name == "The End" %>
 
   <p><a href="/">Play Again?</a></p>
 <% else %>

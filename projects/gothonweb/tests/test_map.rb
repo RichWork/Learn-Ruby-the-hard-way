@@ -42,9 +42,9 @@ class TestGame < Test::Unit::TestCase
 
 
   def test_gothon_game_map()
-      # @@session = Map::current_room('CENTRAL_CORRIDOR')
+       session[:previous_room] = 'START'
       # @@direction = 'shoot!'
-        assert_equal(Map::CC_SHOOT_DEATH, Map::START.go('shoot!'))
+        assert_equal(Map::DEATH, Map::START.go('shoot!'))
         assert_includes(Map::START.go('shoot!').description, "Quick on the")
         assert_includes(Map::START.go('dodge!').description, "Like a world")
 

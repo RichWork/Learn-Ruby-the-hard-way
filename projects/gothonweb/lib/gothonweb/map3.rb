@@ -1,3 +1,5 @@
+# this version needs to be re-written to create map objects as they are entered
+
 class Room
 
   def initialize(name, description)
@@ -27,7 +29,7 @@ end
 #       def enter(prev_room)
 #         @words = []
 #         @prev_room = prev_room
-#         @words.push(Map::@room_deaths[@prev_room]) # pulls the Death scene from the hash
+#         @words.push(Map::@room_deaths[@prev_room]) # pulls the death scene from the hash
 #         # Note that rand will pull an integer and there is a -1 as the quips array starts at 0
 #         @words.push(Map::@quips[rand(0..(@quips.length - 1))])
 #         return @words.join('')
@@ -39,8 +41,9 @@ end
 module Map
   # @@session = []
   # @@direction = []
-  @@code = "#{rand(1..9)}#{rand(1..9)}#{rand(1..9)}"
 
+  @@code = "#{rand(1..9)}#{rand(1..9)}#{rand(1..9)}"
+  @@guesses = 1
 
   @@quips = [
     "You died. You kinda suck at this.",
@@ -50,7 +53,7 @@ module Map
     ]
 
   @@room_deaths = {
-  'the_bridge' =>
+  'THE_BRIDGE_throw_the_bomb' =>
     """
     In a panic you throw the bomb at the group of Gothons
     and make a leap for the door.  Right as you drop it a
@@ -59,7 +62,7 @@ module Map
     the bomb. You die knowing they will probably blow up when
     it goes off.\n
     """,
-  'central_corridor_shoot' =>
+  'CENTRAL_CORRIDOR_shoot!' =>
     """
     Quick on the draw you yank out your blaster and fire it at the Gothon.
     His clown costume is flowing and moving around his body, which throws
@@ -68,7 +71,7 @@ module Map
     makes him fly into an insane rage and blast you repeatedly in the face until
     you are dead.  Then he eats you.\n
     """,
-  'central_corridor_dodge' =>
+  'CENTRAL_CORRIDOR_dodge!' =>
     """
     Like a world class boxer you dodge, weave, slip and slide right
     as the Gothon's blaster cranks a laser past your head.
@@ -77,7 +80,7 @@ module Map
     You wake up shortly after only to die as the Gothon stomps on
     your head and eats you.\n
     """,
-  'laser_weapon_armory' =>
+  'LASER_WEAPON_ARMORY_*' =>
     """
     The lock buzzes one last time and then you hear a sickening
     melting sound as the mechanism is fused together.
@@ -114,8 +117,7 @@ module Map
     neutron bomb in its container.  There's a keypad lock on the box
     and you need the code to get the bomb out.  If you get the code
     wrong 10 times then the lock closes forever and you can't
-    get the bomb.  The code is 3 digits and a color light display blinks above
-    the input.
+    get the bomb.  The code is 3 digits.
     """)
 
 
@@ -173,30 +175,23 @@ module Map
     """
     )
 
-  LWA_CODE = Room.new("Laser Weapon Armory Lock",
-    """
-    BZZZZEDDDD!
-    The lock buzzes and your life shortens further!
-    """
-    )
-
   ESCAPE_POD.add_paths({
     '2' => THE_END_WINNER,
     '*' => THE_END_LOSER
     })
 
   # Must be a way to implement a single room which pulls the description from the name of the previous room
-  CC_SHOOT_DEATH = Room.new("Death", @@room_deaths['central_corridor_shoot'])
+  DEATH = Room.new("death", @@room_deaths[[session[:previous_room]], session[:previous_action]].join('_'))# .include?('CENTRAL_CORRIDOR') ?
 
-  CC_DODGE_DEATH = Room.new("Death", @@room_deaths['central_corridor_dodge'])
+  CC_DODGE_DEATH = Room.new("death", @@room_deaths['central_corridor_dodge'])
 
-  LWA_DEATH = Room.new("Death", @@room_deaths['laser_weapon_armory'])
+  LWA_DEATH = Room.new("death", @@room_deaths['laser_weapon_armory'])
 
-  TB_DEATH = Room.new("Death", @@room_deaths['the_bridge'])
-
-  #GENERIC_DEATH = Room.new('Death',"you died")
-  # DEATH = Room.new("Death", @@session.include?('CENTRAL_CORRIDOR') ?
-  #   @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))] : "Test")
+  TB_DEATH = Room.new("death", @@room_deaths['the_bridge'])
+# use save_previous_room - session[:previous_room] to get room
+  #GENERIC_DEATH = Room.new('death',"you died")
+   # DEATH = Room.new("death", @@session.include?('CENTRAL_CORRIDOR') ?
+   #   @@room_deaths['central_corridor_shoot'] + @@quips[rand(0..(@@quips.length - 1))] : "Test")
 
   THE_BRIDGE.add_paths({
     'throw the bomb' => TB_DEATH, # .enter('the_bridge'), #Death.enter(result.class.name),
@@ -204,18 +199,12 @@ module Map
     })
 
   LASER_WEAPON_ARMORY.add_paths({
-    @@code => THE_BRIDGE,
-    '*' => LWA_CODE
-    })
-
-  LWA_CODE.add_paths({
-    @@code => THE_BRIDGE,
-    '*' => LWA_CODE,
-    'Death' => LWA_DEATH
+    '0132' => THE_BRIDGE,
+    '*' => LWA_DEATH # DEATH.enter('laser_weapon_armory'),
     })
 
   CENTRAL_CORRIDOR.add_paths({
-    'shoot!' => CC_SHOOT_DEATH, # .enter('central_corridor_shoot'),
+    'shoot!' => DEATH, # .enter('central_corridor_shoot'),
     'dodge!' => CC_DODGE_DEATH, # DEATH.enter('central_corridor_dodge'),
     'tell a joke' => LASER_WEAPON_ARMORY
     })
@@ -234,22 +223,48 @@ module Map
       'THE_END_WINNER' => THE_END_WINNER,
       'THE_END_LOSER' => THE_END_LOSER,
       'START' => START,
-      'CC_SHOOT_DEATH' => CC_SHOOT_DEATH,
+      'DEATH' => DEATH,
       'CC_DODGE_DEATH' => CC_DODGE_DEATH,
-      'LWA_CODE' => LWA_CODE,
       'LWA_DEATH' => LWA_DEATH,
       'TB_DEATH' => TB_DEATH
       }
 
+  def scan_code(code,guess)
+    # I made this code to make the random number generator puzzle a bit less gruelling
+    # Basically it creates a light display indicating if a number is correct
+    code_split = code.split('') # code is a string and is split into an array
+    guess_split = guess.split('') # guess is a string and is split into an array
+    click = [] # creates an empty array
+    (0..2).each do |i| # goes through the 3 numbers, and puts i as the number (0 to 2)
+      if guess_split[i] == code_split[i] # checks if the guess matches the code at position i
+        click[i] = "Green" # if yes, goes green
+      else
+        click[i] = "Red" # if no, goes red
+      end
+    end
+    return click.join(', ') # Joins the click array together into a single string separated by ', '
+    # This is then returned to the calling function.
+  end
+
   def Map::load_room(session)
     # Given a session this will return the right room or nil
+    #@@session = session
     return ROOM_NAMES[session[:room]]
   end
+
+  def Map::save_previous_room_and_action(session, previous_room, previous_action)
+    # Store the previous room and action in the session for later, using its name
+    session[:previous_room] = ROOM_NAMES.key(previous_room)
+    session[:previous_action] = previous_action.split(' ').join('_')
+    # these two session variables are used to direct to the correct death Room
+  end
+
 
   def Map::save_room(session, room)
     # Store the room in the session for later, using its name
     session[:room] = ROOM_NAMES.key(room)
   end
+  # Try making previous room session to pull for death scenes
 
   def Map::load_quip
     quips = [
@@ -259,31 +274,5 @@ module Map
       "I have a small puppy that's better at this than you."
       ]
       return quips[rand(0..(quips.length - 1))]
-  end
-
-  def Map::take_LWA_code
-    return @@code
-  end
-
-  def Map::scan_code(code, guess)
-    # This code returns a light display indicating if a number and position is correct
-    code_split = code.split('') # code is a string and is split into an array
-    guess_split = guess.split('') # guess is a string and is split into an array
-    guess_split = guess_split[0..2]
-    click = [] # creates an empty array
-    (0..2).each do |i| # goes through the 3 numbers, and puts i as the number (0 to 2)
-      if guess_split[i] == code_split[i] # checks if the guess matches the code at position i
-        click.push("Green") # if yes, goes green
-        click.push(i)
-      else
-        click.push("Red") # if no, goes red
-        click.push(i)
-      end
-    end
-    click.pop
-    click = click.join(', ')
-    click = click.gsub("0, ", "").gsub("1,", "and")
-    return click # Joins the click array together into a single string separated by ', '
-    # This is then returned to the calling function.
   end
 end

@@ -1,0 +1,17 @@
+<h1> <%= room.name %> </h1>
+
+<pre>
+<%= room.description %>
+
+    The lights above the lock are now lit as <%= light_display %>.
+
+    Your previous attempt was <%= previous_code_guess %>.
+
+    You have <%= guess %> guesses remaining!
+</pre>
+
+<p>
+<form action="/game" method="POST">
+    - <input type="text" name="action"> <input type="SUBMIT">
+</form>
+</p>
