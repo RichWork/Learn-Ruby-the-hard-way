@@ -258,7 +258,7 @@ module Map
       "You such a luser.",
       "I have a small puppy that's better at this than you."
       ]
-      return quips[rand(0..(quips.length - 1))]
+    return quips[rand(0..(quips.length - 1))]
   end
 
   def Map::take_LWA_code
@@ -271,19 +271,26 @@ module Map
     guess_split = guess.split('') # guess is a string and is split into an array
     guess_split = guess_split[0..2]
     click = [] # creates an empty array
+
     (0..2).each do |i| # goes through the 3 numbers, and puts i as the number (0 to 2)
       if guess_split[i] == code_split[i] # checks if the guess matches the code at position i
         click.push("Green") # if yes, goes green
         click.push(i)
+
       else
         click.push("Red") # if no, goes red
         click.push(i)
+
       end
+
     end
+
     click.pop
     click = click.join(', ')
     click = click.gsub("0, ", "").gsub("1,", "and")
+
     return click # Joins the click array together into a single string separated by ', '
     # This is then returned to the calling function.
   end
+
 end

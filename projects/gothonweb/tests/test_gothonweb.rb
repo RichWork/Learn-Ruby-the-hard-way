@@ -12,31 +12,43 @@ class MyAppTest < Test::Unit::TestCase
     Sinatra::Application
   end
 
-# tests that the default page returns the 'Hello world'
+# tests that the default page redirects towards '/game'
   def test_my_default
     get '/'
     follow_redirect!
-    assert last_response.ok? # Not sure what this tests
+    assert last_response.ok? # Tests if a positive redirect response received
     assert_equal "http://example.org/game", last_request.url
-    #assert_redirected_to '/game'
   end
 
   def test_game
+    # session = {}
+    # session[:room] = 'START'
     get '/'
-    follow_redirect!
-    #get '/game'
-    assert last_response.ok? # Not sure what this tests
-    assert last_response.body.include?('The Gothons of Planet') # Tests to see if the text 'A Greeting' is there
-    assert_equal session[:room], 'START'
-    assert_match /\d/ session[:code]
+    #follow_redirect!
+    get '/game'
+    assert last_response.ok? # Tests if a positive redirect response is received
+    assert last_response.body.include?('The Gothons of Planet')
+    assert last_response.body.include?('Central Corridor')
+
+    #assert_equal(session[:guess], 0)
+    #assert_equal(code.length, 3)
   end
 
-  def test_hello_form_post
+  # def test_laser_weapon_armory_lock
+  #   get '/'
+  #   session[:room] = 'LWA_code'
+  #   session[:guess] = 0
+  #   follow_redirect!
+  # end
+
+
+  def test_game_post
     get '/'
     follow_redirect!
     post '/game', params={:action => 'shoot!'} # inputs parameters using "post"
+    follow_redirect!
+    assert last_response.ok? # Tests if a positive redirect response is received
     assert_equal "http://example.org/game", last_request.url
-    #assert last_response.ok? # Still not sure
     assert last_response.body.include?('Quick on the') # checks to see if page switches after input
   end
 

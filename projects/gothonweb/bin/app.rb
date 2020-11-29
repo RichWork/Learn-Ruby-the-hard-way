@@ -9,9 +9,8 @@ enable :sessions
 set :session_secret, 'BADSECRET'
 
 get '/' do
-  session.clear
+  #session.clear
   session[:room] = 'START'
-#  code = Map::take_LWA_code
   session[:guess] = 0
   redirect to('/game')
 end
